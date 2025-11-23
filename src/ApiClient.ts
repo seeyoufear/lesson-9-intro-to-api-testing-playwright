@@ -62,4 +62,30 @@ export class ApiClient {
 
     return json;
   }
+  async getOrderById(id: number): Promise<{ status: number; emptyBody: boolean, raw: string }> {
+    console.log(`Getting order by ID=${id}...`);
+    const response = await this.request.get(`${serviceURL}${orderPath}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.jwt}`
+      }
+    })
+    const text = await response.text();
+    let emptyBody = false;
+
+    if (response.status() === StatusCodes.OK) {
+      emptyBody = text === '' || text === 'null' || text === '{}';
+    }
+    return { status: response.status(), emptyBody, raw: text };
+  }
+
+  async deleteOrderById(id: number): Promise<number> {
+    console.log(`Deleting order by ID=${id}...`)
+    const response = await this.request.delete(`${serviceURL}${orderPath}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.jwt}`
+      }
+    })
+    console.log(`Delete status: ${response.status()}`);
+    return response.status();
+  }
 }
